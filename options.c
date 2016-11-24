@@ -5,8 +5,8 @@
 void
 print_usage(char* app_name)
 {
-	printf("Usage:\n%s [options] [file]\n"
-			"\nIf file is present then that is the input source\n"
+	printf("Usage:\n%s [options] [files]\n"
+			"\nIf any files is present then those are the input source\n"
 			"Otherwise it is stdin\n"
 			"\nPossible options:\n"
 			"-c, --chars \t print the byte counts\n"
@@ -42,7 +42,7 @@ parse_options(int argc, const char** argv, struct Options* options)
 {
 	const char* c_opts[] = {
 		"-c",
-		"--chars"
+		"--bytes"
 	};
 
 	const char* l_opts[] = {
@@ -59,12 +59,13 @@ parse_options(int argc, const char** argv, struct Options* options)
 		"--help"
 	};
 
-	int i;
+	int i = 1;
 	const char* now;
-	options->input = stdin;
+	int files_start = argc;
 
+	memset(options, 0x00, sizeof(struct Options));
 
-	for(i = 1; i < argc; ++i) {
+	while(i < files_start) {
 
 		now = argv[i];
 
@@ -75,7 +76,7 @@ parse_options(int argc, const char** argv, struct Options* options)
 				options->show_help = true;
 
 			else if (string_is_option(now, 2, c_opts))
-				options->chars = true;
+				options->bytes = true;
 
 			else if (string_is_option(now, 2, l_opts))
 				options->lines = true;
@@ -87,18 +88,32 @@ parse_options(int argc, const char** argv, struct Options* options)
 				printf("Invalid option: %s", now);
 				return false;
 			}
+
+			i++;
 		} else {
 		/* it is a filename */
-			
-			options->input = fopen(now, "r");
-
-			if (options->input == NULL) {
-				perror(argv[0]);
-				return false;
-			}
+			files_start--;
+			argv[i] = argv[files_start];
+			argv[files_start] = now;
 		}
 	}
 
+	options->files = argv + files_start;
+	options->filec = argc - files_start;
+
 	return true;
 }
+
+
+#define def_show_fun(field) \
+	bool show_##field(const struct Options options) {\
+		return options.field == true ||\
+		(!options.bytes && !options.lines && !options.words);\
+	}
+
+def_show_fun(bytes)
+def_show_fun(lines)
+def_show_fun(words)
+
+#undef def_show_fn
 
