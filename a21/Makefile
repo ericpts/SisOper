@@ -1,0 +1,3 @@
+TARGETS = main
+
+all: $(TARGETS)
