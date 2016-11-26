@@ -125,24 +125,30 @@ int main(int argc, char** argv)
 			if (fd == -1) {
 				int error = errno;
 				printf("Error opening %s: %s\n", fname, strerror(error));
+				continue;
+			}
 
-			} else {
-				struct Results results;
-				int ret = parse_file(fd, &results);
+			struct Results results;
+			int ret = parse_file(fd, &results);
 
-				if (ret == -1) {
-					int error = errno;
-					printf("Error reading from %s: %s\n", fname, strerror(error));
+			if (ret == -1) {
+				int error = errno;
+				printf("Error reading from %s: %s\n", fname, strerror(error));
+				continue;
 
-				} else {
-					show_results(results, options);
+			}
 
-					printf("%s\n", fname);
+			show_results(results, options);
 
-					total.lines += results.lines;
-					total.words += results.words;
-					total.bytes += results.bytes;
-				}
+			printf("%s\n", fname);
+
+			total.lines += results.lines;
+			total.words += results.words;
+			total.bytes += results.bytes;
+
+			if (close(fd) == -1) {
+				int error = errno;
+				printf("Error closing %s: %s\n", fname, strerror(error));
 			}
 		}
 
