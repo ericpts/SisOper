@@ -109,6 +109,15 @@ void print_diff(struct Vector* v1, struct Vector* v2)
 	}
 }
 
+void dealloc_vector(struct Vector* v)
+{
+	for(int i = 0; i < v->size; ++i)
+	{
+		free(v->data[i]);
+	}
+	Vector_free(v);
+}
+
 int main(int argc, char** argv)
 {
 	if (argc != 3) {
@@ -124,7 +133,8 @@ int main(int argc, char** argv)
 	{
 		int ret = read_directory(argv[1], &v1);
 		if (ret < 0) {
-			printf("Erorred while processing directory %s\nExiting...\n", argv[1]);
+			printf("Errored while processing directory %s\nExiting...\n", argv[1]);
+			dealloc_vector(&v1);
 			return ret;
 		}
 	}
@@ -132,12 +142,15 @@ int main(int argc, char** argv)
 	struct Vector v2;
 	if (Vector_init(&v2)) {
 		perror("Error initializing vector2");
+		dealloc_vector(&v1);
 		return -101;
 	}
 	
 	{
 		int ret = read_directory(argv[2], &v2);
 		if (ret < 0) {
+			dealloc_vector(&v1);
+			dealloc_vector(&v2);
 			printf("Erorred while processing directory %s\nExiting...\n", argv[2]);
 			return ret;
 		}
@@ -151,13 +164,8 @@ int main(int argc, char** argv)
 	print_diff(&v2, &v1);
 	printf("=============================\n");
 
-	for(int i = 0; i < v1.size; ++i)
-		free(v1.data[i]);
-	Vector_free(&v1);
-
-	for(int i = 0; i < v2.size; ++i)
-		free(v2.data[i]);
-	Vector_free(&v2);
+	dealloc_vector(&v1);
+	dealloc_vector(&v2);
 
 	return 0;
 }
