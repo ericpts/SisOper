@@ -60,6 +60,7 @@ int read_directory(const char* const dirname, struct Vector* const vector)
 			int ret = snprintf(fname, n, "%s/%s", dirname, ent->d_name);
 			if (ret < 0) {
 				perror("Error in snprintf");
+				free(fname);
 				return -5;
 			}
 		}
@@ -71,6 +72,7 @@ int read_directory(const char* const dirname, struct Vector* const vector)
 			if (ret == -1) {
 				int error = errno;
 				printf("Error reading stats for %s: %s\n", fname, strerror(error));
+				free(fname);
 				return -3;
 			}
 		}
@@ -80,6 +82,7 @@ int read_directory(const char* const dirname, struct Vector* const vector)
 
 			if (Vector_add(vector, fname) < 0) {
 				perror("Error in adding to vector");
+				free(fname);
 				return -6;
 			}
 			/* recurse down */
