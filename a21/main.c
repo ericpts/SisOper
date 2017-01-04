@@ -45,6 +45,8 @@ int main(int argc, char** argv)
 
 	printf("%s\n", buffer);
 	system(buffer);
+
+	free(buffer);
 	
 	return 0;
 }
