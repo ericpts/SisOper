@@ -64,7 +64,7 @@ int main(int argc, char** argv)
 			perror("dup2");
 			exit(EXIT_FAILURE);
 		}
-		execl(argv[1], NULL);
+		execl(argv[1], argv[1], NULL);
 	}
 
 	

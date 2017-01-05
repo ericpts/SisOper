@@ -9,7 +9,7 @@ int main()
 	printf("%d\n", d);
 	fflush(stdout);
 
-	execl("child", (char*)NULL);
+	execl("child", "child", (char*)NULL);
 
 	return 0;
 }
